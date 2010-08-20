@@ -8,6 +8,7 @@
 // This script does not display the available actions correctly in the pages that perform some actions themselves, e.g. "Crimes" page or "Steal car" page, due to technical limitations.
 // This script does not display the available actions correctly when you are in prison, since I don't think it's worthy to add special treatments about this situation. We are sure that you are sensible enough to understand that you cannot do anything when you are in prison, without a hint from a Greasemonkey script.
 // Contact HiddenKnowledge for bugs and support. Installing a Bugzilla or Trac for one Greasemonkey script is plainly not so worthwhile.
+// Currently actions like "Ammunation production" are not implemented yet.
 
 const buttonvals = new Array(
 		new Array('http://www.mafiacreator.com/Mafia-Greed/crimes', '<a href="http://www.mafiacreator.com/Mafia-Greed/crimes">Crime</a> '),
