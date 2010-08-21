@@ -15,7 +15,7 @@
 const buttonvals = new Array(
 		new Array('http://www.mafiacreator.com/Mafia-Greed/crimes', '<a href="http://www.mafiacreator.com/Mafia-Greed/crimes">Crime</a> '),
 		new Array('http://www.mafiacreator.com/Mafia-Greed/cars/steal', '<a href="http://www.mafiacreator.com/Mafia-Greed/cars/steal">Steal car</a> '),
-		new Array('http://www.mafiacreator.com/Mafia-Greed/red-light-district/search', '<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">Red light district</a> '),
+		new Array('http://www.mafiacreator.com/Mafia-Greed/red-light-district/search', '<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">Search for Dentists</a> '),
 		new Array('http://www.mafiacreator.com/Mafia-Greed/boxing', '<a href="http://www.mafiacreator.com/Mafia-Greed/boxing">Boxing</a> '),
 		new Array('http://www.mafiacreator.com/Mafia-Greed/family/crimes', '<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> ')
 		);
