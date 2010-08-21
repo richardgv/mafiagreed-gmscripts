@@ -15,7 +15,7 @@
 const buttonvals = new Array(
 		new Array('http://www.mafiacreator.com/Mafia-Greed/crimes', '<a href="http://www.mafiacreator.com/Mafia-Greed/crimes">Crime</a> '),
 		new Array('http://www.mafiacreator.com/Mafia-Greed/cars/steal', '<a href="http://www.mafiacreator.com/Mafia-Greed/cars/steal">Steal car</a> '),
-		new Array('http://www.mafiacreator.com/Mafia-Greed/red-light-district/search', '<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">Red light district</a> '),
+		new Array('http://www.mafiacreator.com/Mafia-Greed/red-light-district/search', '<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">Search for Dentists</a> '),
 		new Array('http://www.mafiacreator.com/Mafia-Greed/boxing', '<a href="http://www.mafiacreator.com/Mafia-Greed/boxing">Boxing</a> '),
 		new Array('http://www.mafiacreator.com/Mafia-Greed/family/crimes', '<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> ')
 		);
@@ -40,9 +40,13 @@ var inputnode;
 var pgsession = false;
 var activerequests = buttonvals.length;
 var str;
+var ele;
 
 // Ajax action checking functions
 function fcheckactions() {
+	if(GM_getValue("ajaxsessionrefresh") && null != (ele = document.evaluate("//td/input[@type='submit'][@class='submit good']", document, null
+					, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue))
+		ele.disabled = "disabled";
 	for(i = 0; i < buttonvals.length; i++)
 		fcheckaction(i);
 }
@@ -78,6 +82,9 @@ function fsessionrefresh() {
 						str = str.match(/\d+$/)[0];
 						document.evaluate("//td/input[@type='submit'][@class='submit good']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.name = str;
 					}
+					if(null != (ele = document.evaluate("//td/input[@type='submit'][@class='submit good']", document, null
+							, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue))
+						ele.removeAttribute("disabled");
 				}
 			};
 		xmlhttp.open("GET", document.URL, true);
@@ -94,7 +101,7 @@ if(GM_getValue("adclickmissionsontop")) {
 		}
 	}
 	logo.appendChild(formnode);
-	var ele = document.evaluate("//strong[string()='Ad clicks']/parent::td/parent::tr", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	ele = document.evaluate("//strong[string()='Ad clicks']/parent::td/parent::tr", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 	if(ele)
 		ele.parentNode.removeChild(ele);
 }
