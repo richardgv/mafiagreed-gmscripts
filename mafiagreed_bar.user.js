@@ -13,21 +13,24 @@
 
 // Script constants
 const buttonvals = new Array(
-		new Array('http://www.mafiacreator.com/Mafia-Greed/crimes', '<a href="http://www.mafiacreator.com/Mafia-Greed/crimes">Crime</a> '),
-		new Array('http://www.mafiacreator.com/Mafia-Greed/cars/steal', '<a href="http://www.mafiacreator.com/Mafia-Greed/cars/steal">Steal car</a> '),
-		new Array('http://www.mafiacreator.com/Mafia-Greed/red-light-district/search', '<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">Red light district</a> '),
-		new Array('http://www.mafiacreator.com/Mafia-Greed/boxing', '<a href="http://www.mafiacreator.com/Mafia-Greed/boxing">Boxing</a> '),
-		new Array('http://www.mafiacreator.com/Mafia-Greed/family/crimes', '<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> ')
+		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/crimes">Crime</a> '
+			, /cdtimer\(0,"crimes",\d+/),
+		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/cars/steal">Steal car</a> '
+			, /cdtimer\(2,"cars\/steal",\d+/),
+		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">RLD</a> '
+			, /cdtimer\(4,"red-light-district",\d+/),
+		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/boxing">Boxing</a> '
+			, /cdtimer\(7,"boxing",\d+/),
+		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> '
+			, /cdtimer\(11,"family\/crimes",\d+/)
 		);
-const signwait = /You (have to|must) wait/;
-const signprison = /If you are in prison you can bribe the warden in exchange/;
+const signprison = /behind bar/;
+const timechkurl = "http://www.mafiacreator.com/Mafia-Greed";
+const logoid = "logobar";
 
 // Initializing script configurations
 if(null == GM_getValue("ajaxactioncheck")) {
-	GM_setValue("ajaxactioncheck", 2);
-}
-if(null == GM_getValue("ajaxsessionrefresh")) {
-	GM_setValue("ajaxsessionrefresh", true);
+	GM_setValue("ajaxactioncheck", true);
 }
 if(null == GM_getValue("adclickmissionsontop")) {
 	GM_setValue("adclickmissionsontop", true);
@@ -37,61 +40,51 @@ if(null == GM_getValue("adclickmissionsontop")) {
 var logo = document.createElement("div");
 var formnode = document.createElement("form");
 var inputnode;
-var pgsession = false;
-var activerequests = buttonvals.length;
 var str;
 var ele;
+var tmoutid = new Array(new Array(buttonvals.length)
+		, new Array(buttonvals.length));
 
 // Ajax action checking functions
 function fcheckactions() {
-	if(GM_getValue("ajaxsessionrefresh") && null != (ele = document.evaluate("//td/input[@type='submit'][@class='submit good']", document, null
-					, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue))
-		ele.disabled = "disabled";
-	for(i = 0; i < buttonvals.length; i++)
-		fcheckaction(i);
-}
-
-function fcheckaction(j) {
-	if(buttonvals[j][0] == document.URL) {
-		activerequests--;
-		return;
-	}
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function() {
 			if (xmlhttp.readyState == 4) {
-				if(!(--activerequests) && GM_getValue("ajaxsessionrefresh")) fsessionrefresh();
-				if(xmlhttp.status != 200 || -1 == xmlhttp.responseText.search(signwait)) {
-						logo.innerHTML += buttonvals[j][1];
+				if(xmlhttp.status != 200 || -1 != xmlhttp.responseText.search(signprison)) {
+					for(i = 0; i < buttonvals.length; i++)
+						logo.innerHTML += buttonvals[i][0];
 				}
+				else
+					for(i = 0; i < buttonvals.length; i++)
+						fcheckactionproc(i, fcheckaction(i, xmlhttp.responseText));
 			}
 		};
-	xmlhttp.open("GET", buttonvals[j][0], true);
+	xmlhttp.open("GET", timechkurl, true);
 	xmlhttp.send();
 }
-function fsessionrefresh() {
-	if(null != document.evaluate("//td/input[@type='submit'][@class='submit good']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue) {
-		var xmlhttp = new XMLHttpRequest();
-		xmlhttp.onreadystatechange = function() {
-				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-					if(str = xmlhttp.responseText.match(/<td width="1%">&nbsp;<input type="hidden" name="sess" value="\d+/)[0]) {
-						str = str.match(/\d+$/)[0];
-						if(null != (ele = document.evaluate("//input[@type='hidden'][@name='sess']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue))
-							ele.value = str;
-					}
-					if(str = xmlhttp.responseText.match(/%"><input class="submit good" type="submit" name="\d+/)[0]) {
-						str = str.match(/\d+$/)[0];
-						document.evaluate("//td/input[@type='submit'][@class='submit good']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.name = str;
-					}
-					if(null != (ele = document.evaluate("//td/input[@type='submit'][@class='submit good']", document, null
-							, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue))
-						ele.removeAttribute("disabled");
-				}
-			};
-		xmlhttp.open("GET", document.URL, true);
-		xmlhttp.send();
+function fcheckaction(j, rsptext) {
+	var tmmatch = rsptext.match(buttonvals[j][1]);
+	if(null == tmmatch)
+		return 0;
+	tmmatch = tmmatch[0].match(/\d+$/);
+	return parseInt(tmmatch[0], 10);
+}
+function fcheckactionproc(j, tm) {
+	if(tm) {
+		tmoutid[0][j] = window.setTimeout(
+				"document.getElementById('" + logoid + "').innerHTML += '"
+				+ buttonvals[j][0] + "';", tm);
+		// TODO: Adding a timer on the bar to display the time left until
+		//       an action is available
 	}
+	else fcheckactionavail(j);
 }
 
+function fcheckactionavail(j) {
+	logo.innerHTML += buttonvals[j][0];
+}
+
+logo.id = logoid;
 logo.setAttribute("style", "margin: 0 auto 0 auto; border-bottom: 1px solid #000000; margin-bottom: 5px; font-size: small; background-color: #000000; color: #ffffff; text-align: center;");
 formnode.method = "post";
 if(GM_getValue("adclickmissionsontop")) {
@@ -110,16 +103,5 @@ document.body.insertBefore(logo, document.body.firstChild);
 
 // Ajax action check
 if(GM_getValue("ajaxactioncheck")) {
-	for(i = 0; i < buttonvals.length; i++) {
-		if(buttonvals[i][0] == document.URL) {
-			pgsession = true;
-			break;
-		}
-	}
-	if(pgsession && 1 == GM_getValue("ajaxactioncheck")) {
-		for(i = 0; i < buttonvals.length; i++) {
-			logo.innerHTML += buttonvals[i][1];
-		}
-	}
-	else { fcheckactions(); }
+	fcheckactions();
 }
