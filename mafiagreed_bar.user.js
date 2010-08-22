@@ -27,6 +27,9 @@ const timechkurl = "http://www.mafiacreator.com/Mafia-Greed";
 const logoid = "logobar";
 
 // Initializing script configurations
+if(null == GM_getValue("jailrefresh")){
+	GM_setValue("jailrefresh", false);
+}
 if(null == GM_getValue("ajaxactioncheck")) {
 	GM_setValue("ajaxactioncheck", true);
 }
@@ -86,7 +89,9 @@ function fcheckactions() {
 						|| -1 != xmlhttp.responseText.search(signprison)) {
 					fprtallactions();
 					logo.innerHTML += " <small>(Jailed)</small>";
+					if(gm_getValue("jailrefresh") == true){
 					window.setTimeout(function() { window.location.href=window.location.href }, 10000);
+					}
 				}
 				else
 					for(i = 0; i < buttonvals.length; i++)
