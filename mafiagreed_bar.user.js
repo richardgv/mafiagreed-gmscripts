@@ -7,8 +7,6 @@
 // ==/UserScript==
 
 // Script distributed under GPL license.
-// This script does not display the available actions correctly in the pages that perform some actions themselves, e.g. "Crimes" page or "Steal car" page, due to technical limitations.
-// This script does not display the available actions correctly when you are in prison, since I don't think it's worthy to add special treatments about this situation. We are sure that you are sensible enough to understand that you cannot do anything when you are in prison, without a hint from a Greasemonkey script.
 // Contact HiddenKnowledge (HiddenKn) for bugs and support. Installing a Bugzilla or Trac for one Greasemonkey script is plainly not so worthwhile.
 
 // Script constants
@@ -36,6 +34,28 @@ if(null == GM_getValue("adclickmissionsontop")) {
 	GM_setValue("adclickmissionsontop", true);
 }
 
+// Creating script menus
+GM_registerMenuCommand("Enable ajax action check (default)",
+		foptiononjaxactioncheck);
+GM_registerMenuCommand("Disable ajax action check",
+		foptionoffjaxactioncheck);
+GM_registerMenuCommand("Put ad clickmissions on the top (default)",
+		foptiononadclickmissionsontop);
+GM_registerMenuCommand("Keep ad click missions in their original position",
+		foptionoffadclickmissionsontop);
+function foptiononjaxactioncheck() {
+	GM_setValue("ajaxactioncheck", true);
+}
+function foptionoffjaxactioncheck() {
+	GM_setValue("ajaxactioncheck", false);
+}
+function foptiononadclickmissionsontop() {
+	GM_setValue("adclickmissionsontop", true);
+}
+function foptionoffadclickmissionsontop() {
+	GM_setValue("adclickmissionsontop", false);
+}
+
 // Variable declarations
 var logo = document.createElement("div");
 var formnode = document.createElement("form");
@@ -50,9 +70,9 @@ function fcheckactions() {
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function() {
 			if (xmlhttp.readyState == 4) {
-				if(xmlhttp.status != 200 || -1 != xmlhttp.responseText.search(signprison)) {
-					for(i = 0; i < buttonvals.length; i++)
-						logo.innerHTML += buttonvals[i][0];
+				if(xmlhttp.status != 200
+						|| -1 != xmlhttp.responseText.search(signprison)) {
+					fprtallactions();
 				}
 				else
 					for(i = 0; i < buttonvals.length; i++)
@@ -78,6 +98,11 @@ function fcheckactionproc(j, tm) {
 		//       an action is available
 	}
 	else fcheckactionavail(j);
+}
+function fprtallactions() {
+	var j;
+	for(j = 0; j < buttonvals.length; j++)
+		logo.innerHTML += buttonvals[j][0];
 }
 
 function fcheckactionavail(j) {
@@ -105,3 +130,4 @@ document.body.insertBefore(logo, document.body.firstChild);
 if(GM_getValue("ajaxactioncheck")) {
 	fcheckactions();
 }
+else fprtallactions();
