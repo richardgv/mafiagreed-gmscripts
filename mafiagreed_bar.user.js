@@ -35,25 +35,37 @@ if(null == GM_getValue("adclickmissionsontop")) {
 }
 
 // Creating script menus
+if(false == GM_getValue("ajaxactioncheck")){
 GM_registerMenuCommand("Enable ajax action check (default)",
 		foptiononjaxactioncheck);
+}
+else {
 GM_registerMenuCommand("Disable ajax action check",
 		foptionoffjaxactioncheck);
+}
+if(false == GM_getValue("adclickmissionsontop")){
 GM_registerMenuCommand("Put ad clickmissions on the top (default)",
 		foptiononadclickmissionsontop);
+}
+else {
 GM_registerMenuCommand("Keep ad click missions in their original position",
 		foptionoffadclickmissionsontop);
+}
 function foptiononjaxactioncheck() {
 	GM_setValue("ajaxactioncheck", true);
+	window.location.reload();
 }
 function foptionoffjaxactioncheck() {
 	GM_setValue("ajaxactioncheck", false);
+	window.location.reload();
 }
 function foptiononadclickmissionsontop() {
 	GM_setValue("adclickmissionsontop", true);
+	window.location.reload();
 }
 function foptionoffadclickmissionsontop() {
 	GM_setValue("adclickmissionsontop", false);
+	window.location.reload();
 }
 
 // Variable declarations
