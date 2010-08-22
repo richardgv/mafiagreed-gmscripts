@@ -73,7 +73,7 @@ function fcheckactionproc(j, tm) {
 	if(tm) {
 		tmoutid[0][j] = window.setTimeout(
 				"document.getElementById('" + logoid + "').innerHTML += '"
-				+ buttonvals[j][0] + "';", tm);
+				+ buttonvals[j][0] + "';", tm * 1000);
 		// TODO: Adding a timer on the bar to display the time left until
 		//       an action is available
 	}
