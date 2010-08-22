@@ -85,6 +85,8 @@ function fcheckactions() {
 				if(xmlhttp.status != 200
 						|| -1 != xmlhttp.responseText.search(signprison)) {
 					fprtallactions();
+					logo.innerHTML += " <small>(Jailed)</small>";
+					window.setTimeout(function() { window.location.href=window.location.href }, 10000);
 				}
 				else
 					for(i = 0; i < buttonvals.length; i++)
