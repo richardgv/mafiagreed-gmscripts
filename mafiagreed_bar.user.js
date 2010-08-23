@@ -89,7 +89,7 @@ function fcheckactions() {
 						|| -1 != xmlhttp.responseText.search(signprison)) {
 					fprtallactions();
 					logo.innerHTML += " <small>(Jailed)</small>";
-					if(gm_getValue("jailrefresh") == true){
+					if(GM_getValue("jailrefresh") == true){
 					window.setTimeout(function() { window.location.href=window.location.href }, 10000);
 					}
 				}
