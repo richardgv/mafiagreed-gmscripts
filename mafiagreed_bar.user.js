@@ -22,20 +22,41 @@ const buttonvals = new Array(
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> '
 			, /cdtimer\(11,"family\/crimes",\d+/)
 		);
+const prefs = new Array(
+		new Array("ajaxactioncheck", true),
+		new Array("showtimer", true),
+		new Array("adclickmissionsontop", true),
+		new Array("style", "#actionlist a { text-decoration: none; } #actionlist #status { color: red; } #actionlist .actavail a { color: green; } #actionlist .actunavail a { color: grey; } #actionlist .actwarn a { color: red; }"),
+		new Array("actionlistdefcontent", '<a href="http://www.mafiacreator.com/Mafia-Greed/kill-list">Bounty list</a> '),
+		new Array("actiontimerprefix", "("),
+		new Array("actiontimerpostfix", ") "),
+		new Array("warnthreshold", 10),
+		new Array("statusnormal", "<a id=\"status\">NORMAL</a> "),
+		new Array("statusinprison", "<a id=\"status\">IN PRISON</a> "),
+		new Array("statusinprisontitleprefix", "(In prison) "),
+		new Array("statusinprisontitlepostfix", ""),
+		new Array("statusneterror", "<a id=\"status\">NETERROR</a> ")
+		);
 const signprison = /behind bar/;
 const timechkurl = "http://www.mafiacreator.com/Mafia-Greed";
 const logoid = "logobar";
+const actionlistid = "actionlist";
+const actionlisttext = "actionlist";
+const actionlistidprefix = "actlst_";
+const actionlistclass = "actlnk"
+const actiontimerclass = "acttimer"
+const actiontimeridprefix = "acttimer_";
+const actiontimerwrapperidprefix = "acttimerwrapper_";
+const actionlistavailableclass = "actavail";
+const actionlistunavailableclass = "actunavail";
+const actionlistwarnclass = "actwarn";
+const actionlistunknownclass = "actunk";
 
 // Initializing script configurations
-if(null == GM_getValue("jailrefresh")){
-	GM_setValue("jailrefresh", false);
-}
-if(null == GM_getValue("ajaxactioncheck")) {
-	GM_setValue("ajaxactioncheck", true);
-}
-if(null == GM_getValue("adclickmissionsontop")) {
-	GM_setValue("adclickmissionsontop", true);
-}
+var i;
+for(i = 0; i < prefs.length; i++)
+	if(null == GM_getValue(prefs[i][0]))
+		GM_setValue(prefs[i][0], prefs[i][1]);
 
 // Creating script menus
 if(false == GM_getValue("ajaxactioncheck")){
@@ -74,34 +95,44 @@ function foptionoffadclickmissionsontop() {
 // Variable declarations
 var logo = document.createElement("div");
 var formnode = document.createElement("form");
+var actionlistnode = document.createElement("div");
 var inputnode;
 var str;
 var ele;
 var tmoutid = new Array(new Array(buttonvals.length)
-		, new Array(buttonvals.length));
+		, new Array(buttonvals.length)
+		, new Array(buttonvals.length)
+		, new Array(buttonvals.length)
+		, new Array(buttonvals.length)
+		);
 
 // Ajax action checking functions
 function fcheckactions() {
 	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange=function() {
+	xmlhttp.onreadystatechange = function() {
 			if (xmlhttp.readyState == 4) {
-				if(xmlhttp.status != 200
-						|| -1 != xmlhttp.responseText.search(signprison)) {
+				if(xmlhttp.status != 200) {
+					actionlistnode.innerHTML = GM_getValue("statusneterror");
 					fprtallactions();
-					logo.innerHTML += " <small>(Jailed)</small>";
-					if(gm_getValue("jailrefresh") == true){
-					window.setTimeout(function() { window.location.href=window.location.href }, 10000);
-					}
 				}
-				else
+				else if(-1 != xmlhttp.responseText.search(signprison)) {
+						actionlistnode.innerHTML += GM_getValue("statusinprison");
+						document.title = GM_getValue("statusinprisontitleprefix")
+							+ document.title
+							+ GM_getValue("statusinprisontitlepostfix");
+				}
+				else {
+					actionlistnode.innerHTML += GM_getValue("statusnormal");
 					for(i = 0; i < buttonvals.length; i++)
-						fcheckactionproc(i, fcheckaction(i, xmlhttp.responseText));
+						fcheckactionproc(i
+								, fchecktime(i, xmlhttp.responseText));
+				}
 			}
 		};
 	xmlhttp.open("GET", timechkurl, true);
 	xmlhttp.send();
 }
-function fcheckaction(j, rsptext) {
+function fchecktime(j, rsptext) {
 	var tmmatch = rsptext.match(buttonvals[j][1]);
 	if(null == tmmatch)
 		return 0;
@@ -109,28 +140,96 @@ function fcheckaction(j, rsptext) {
 	return parseInt(tmmatch[0], 10);
 }
 function fcheckactionproc(j, tm) {
-	if(tm) {
+	var ele, elewrapper;
+	if(!tm) fcheckactionavailable(j);
+	else {
+		ele = document.createElement("a");
+		ele.id = actionlistidprefix + j;
+		if(tm <= GM_getValue("warnthreshold")) {
+			ele.setAttribute("class", actionlistwarnclass);
+		}
+		else {
+			ele.setAttribute("class", actionlistunavailableclass);
+			tmoutid[1][j] = window.setTimeout(
+					"document.evaluate(\"//a[@id='"
+					+ actionlistidprefix + j
+					+ "']\", document, null, XPathResult"
+					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue..setAttribute('class', '"
+					+ actionlistwarnclass + "');"
+					, tm * 1000 - GM_getValue("warnthreshold"));
+		}
+		ele.innerHTML = buttonvals[j][0];
+		actionlistnode.appendChild(ele);
+		if(GM_getValue("showtimer")) {
+			ele = document.createElement("a");
+			ele.innerHTML = tm; 
+			ele.id = actiontimeridprefix + j;
+			elewrapper = document.createElement("a");
+			elewrapper.id = actiontimerwrapperidprefix + j;
+			elewrapper.innerHTML = GM_getValue("actiontimerprefix");
+			elewrapper.appendChild(ele);
+			elewrapper.innerHTML += GM_getValue("actiontimerpostfix");
+			elewrapper.setAttribute("class", actiontimerclass + " ");
+			actionlistnode.appendChild(elewrapper);
+			if(tm <= GM_getValue("warnthreshold"))
+				elewrapper.setAttribute("class", actionlistwarnclass);
+			else {
+				elewrapper.setAttribute("class", actionlistunavailableclass);
+				tmoutid[3][j] = window.setTimeout(
+						"document.evaluate(\"//a[@id='"
+						+ actiontimerwrapperidprefix + j
+						+ "']\", document, null, XPathResult"
+						+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue..setAttribute('class', '"
+						+ actionlistwarnclass + "');"
+						, tm * 1000 - GM_getValue("warnthreshold"));
+			}
+			tmoutid[2][j] = window.setTimeout(
+					"var ele = document.evaluate(\"//a[@id='"
+					+ actiontimerwrapperidprefix + j
+					+ "']\", document, null, XPathResult"
+					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;"
+					+ "ele.parentNode.removeChild(ele);"
+					, tm * 1000);
+			tmoutid[4][j] = window.setInterval(
+					"var ele = document.evaluate(\"//a[@id='"
+					+ actiontimeridprefix + j
+					+ "']\", document, null, XPathResult"
+					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;"
+					+ "ele.innerHTML = parseInt(ele.innerHTML, 10) - 1;"
+					, 1000);
+		}
 		tmoutid[0][j] = window.setTimeout(
-				"document.getElementById('" + logoid + "').innerHTML += '"
-				+ buttonvals[j][0] + "';", tm * 1000);
-		// TODO: Adding a timer on the bar to display the time left until
-		//       an action is available
+				"document.evaluate(\"//a[@id='"
+				+ actionlistidprefix + j
+				+ "']\", document, null, XPathResult"
+					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue..setAttribute('class', '"
+				+ actionlistavailableclass + "');"
+				, tm * 1000);
 	}
-	else fcheckactionavail(j);
 }
 function fprtallactions() {
-	var j;
-	for(j = 0; j < buttonvals.length; j++)
-		logo.innerHTML += buttonvals[j][0];
+	var j, ele;
+	for(j = 0; j < buttonvals.length; j++) {
+		ele = document.createElement("a");
+		ele.id = actionlistidprefix + j;
+		ele.setAttribute("class", actionlistunknownclass);
+		ele.innerHTML = buttonvals[j][0];
+		actionlistnode.appendChild(ele);
+	}
 }
 
-function fcheckactionavail(j) {
-	logo.innerHTML += buttonvals[j][0];
+function fcheckactionavailable(j) {
+	var ele = document.createElement("a");
+	ele.id = actionlistidprefix + j;
+	ele.setAttribute("class", actionlistavailableclass);
+	ele.innerHTML = buttonvals[j][0];
+	actionlistnode.appendChild(ele);
 }
 
 logo.id = logoid;
 logo.setAttribute("style", "margin: 0 auto 0 auto; border-bottom: 1px solid #000000; margin-bottom: 5px; font-size: small; background-color: #000000; color: #ffffff; text-align: center;");
 formnode.method = "post";
+actionlistnode.id = actionlistid;
 if(GM_getValue("adclickmissionsontop")) {
 	for(i = 1; i <= 5; i++) {
 		if(null != (inputnode = document.evaluate("//input[@type='submit'][@name='clickmission'][@value='" + i + "']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue)) {
@@ -142,8 +241,16 @@ if(GM_getValue("adclickmissionsontop")) {
 	if(ele)
 		ele.parentNode.removeChild(ele);
 }
-logo.innerHTML += '<a href="http://www.mafiacreator.com/Mafia-Greed/kill-list">Bounty list</a> ';
+actionlistnode.innerHTML = GM_getValue("actionlistdefcontent");
+logo.appendChild(actionlistnode);
 document.body.insertBefore(logo, document.body.firstChild);
+GM_addStyle(GM_getValue("style"));
+ele = document.evaluate("//input[@class='submit bad']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+if(ele)
+	ele.parentNode.removeChild(ele);
+ele = document.evaluate("//span[@style='display: none;']/input[@class='submit good']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+if(ele)
+	ele.parentNode.removeChild(ele);
 
 // Ajax action check
 if(GM_getValue("ajaxactioncheck")) {
