@@ -154,9 +154,9 @@ function fcheckactionproc(j, tm) {
 					"document.evaluate(\"//a[@id='"
 					+ actionlistidprefix + j
 					+ "']\", document, null, XPathResult"
-					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue..setAttribute('class', '"
+					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.setAttribute('class', '"
 					+ actionlistwarnclass + "');"
-					, tm * 1000 - GM_getValue("warnthreshold"));
+					, (tm - GM_getValue("warnthreshold")) * 1000);
 		}
 		ele.innerHTML = buttonvals[j][0];
 		actionlistnode.appendChild(ele);
@@ -181,7 +181,7 @@ function fcheckactionproc(j, tm) {
 						+ "']\", document, null, XPathResult"
 						+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue..setAttribute('class', '"
 						+ actionlistwarnclass + "');"
-						, tm * 1000 - GM_getValue("warnthreshold"));
+						, (tm - GM_getValue("warnthreshold")) * 1000);
 			}
 			tmoutid[2][j] = window.setTimeout(
 					"var ele = document.evaluate(\"//a[@id='"
@@ -202,7 +202,7 @@ function fcheckactionproc(j, tm) {
 				"document.evaluate(\"//a[@id='"
 				+ actionlistidprefix + j
 				+ "']\", document, null, XPathResult"
-					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue..setAttribute('class', '"
+					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.setAttribute('class', '"
 				+ actionlistavailableclass + "');"
 				, tm * 1000);
 	}
