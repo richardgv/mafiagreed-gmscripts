@@ -179,7 +179,7 @@ function fcheckactionproc(j, tm) {
 						"document.evaluate(\"//a[@id='"
 						+ actiontimerwrapperidprefix + j
 						+ "']\", document, null, XPathResult"
-						+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue..setAttribute('class', '"
+						+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.setAttribute('class', '"
 						+ actionlistwarnclass + "');"
 						, (tm - GM_getValue("warnthreshold")) * 1000);
 			}
