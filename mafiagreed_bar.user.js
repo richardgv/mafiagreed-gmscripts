@@ -26,16 +26,17 @@ const prefs = new Array(
 		new Array("ajaxactioncheck", true),
 		new Array("showtimer", true),
 		new Array("adclickmissionsontop", true),
-		new Array("style", "#actionlist a { text-decoration: none; } #actionlist #status { color: red; } #actionlist .actavail a { color: green; } #actionlist .actunavail a { color: grey; } #actionlist .actwarn a { color: red; }"),
+		new Array("rmbadbuttons", true),
+		new Array("style", '#logobar { margin: 0 auto; font: 9pt "DejaVu Sans", Tahoma, sans-serif; background-color: rgba(10, 10, 10, 0.6); color: white; text-align: center; position: fixed; width: 100%; z-index: 999; left: 0; top: 0; } #actionlist a { text-decoration: none; } #status { font-size: 8pt; display: block; padding: 4px; position: fixed; left: 0; top: 0; } .statusinprison, .statusneterr { background: red; color: white; } .statusnormal { background-color: green; } #actionlist .actavail { background: green; padding: 0 2px; margin: 0 2px; } #actionlist .actunavail, #actionlist .actunavail a { color: lightGrey; } #actionlist .actwarn { background-color: red; padding: 0 2px; margin: 2px; }'),
 		new Array("actionlistdefcontent", '<a href="http://www.mafiacreator.com/Mafia-Greed/kill-list">Bounty list</a> '),
 		new Array("actiontimerprefix", "("),
 		new Array("actiontimerpostfix", ") "),
 		new Array("warnthreshold", 10),
-		new Array("statusnormal", "<a id=\"status\">NORMAL</a> "),
-		new Array("statusinprison", "<a id=\"status\">IN PRISON</a> "),
+		new Array("statusnormal", '<a id="status" class="statusnormal">NORMAL</a> '),
+		new Array("statusinprison", '<a id="status" class="statusinprison">IN PRISON</a> '),
 		new Array("statusinprisontitleprefix", "(In prison) "),
 		new Array("statusinprisontitlepostfix", ""),
-		new Array("statusneterror", "<a id=\"status\">NETERROR</a> ")
+		new Array("statusneterror", '<a id="status" class="statusneterr">NETERROR</a> ')
 		);
 const signprison = /behind bar/;
 const timechkurl = "http://www.mafiacreator.com/Mafia-Greed";
@@ -227,7 +228,6 @@ function fcheckactionavailable(j) {
 }
 
 logo.id = logoid;
-logo.setAttribute("style", "margin: 0 auto 0 auto; border-bottom: 1px solid #000000; margin-bottom: 5px; font-size: small; background-color: #000000; color: #ffffff; text-align: center;");
 formnode.method = "post";
 actionlistnode.id = actionlistid;
 if(GM_getValue("adclickmissionsontop")) {
@@ -245,12 +245,14 @@ actionlistnode.innerHTML = GM_getValue("actionlistdefcontent");
 logo.appendChild(actionlistnode);
 document.body.insertBefore(logo, document.body.firstChild);
 GM_addStyle(GM_getValue("style"));
-ele = document.evaluate("//input[@class='submit bad']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-if(ele)
-	ele.parentNode.removeChild(ele);
-ele = document.evaluate("//span[@style='display: none;']/input[@class='submit good']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-if(ele)
-	ele.parentNode.removeChild(ele);
+if(GM_getValue("rmbadbuttons")) {
+	ele = document.evaluate("//input[@class='submit bad']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	if(ele)
+		ele.parentNode.removeChild(ele);
+	ele = document.evaluate("//span[@style='display: none;']/input[@class='submit good']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	if(ele)
+		ele.parentNode.removeChild(ele);
+}
 
 // Ajax action check
 if(GM_getValue("ajaxactioncheck")) {
