@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Mafiagreed Bar
-// @namespace      http://github.com/richardgv/mafiagreed-gmscripts
+// @namespace      http://github.com/HiddenKn/mafiagreed-gmscripts-experimental
 // @include        http://www.mafiacreator.com/Mafia-Greed
 // @include        http://www.mafiacreator.com/Mafia-Greed/*
 // @exclude        http://www.mafiacreator.com/Mafia-Greed/admin*
@@ -23,6 +23,7 @@ const buttonvals = new Array(
 			, /cdtimer\(1(0|1),"family\/crimes",\d+/)
 		);
 const prefs = new Array(
+		new Array("autorefresh", 10),
 		new Array("ajaxactioncheck", true),
 		new Array("showtimer", true),
 		new Array("adclickmissionsontop", true),
@@ -117,6 +118,9 @@ function fcheckactions() {
 					fprtallactions();
 				}
 				else if(-1 != xmlhttp.responseText.search(signprison)) {
+						if(GM_getValue("autorefresh") + "000" > 0){
+						window.setTimeout(function() { window.location.href=window.location.href }, (GM_getValue("autorefresh") + "000"));
+						}
 						actionlistnode.innerHTML += GM_getValue("statusinprison");
 						document.title = GM_getValue("statusinprisontitleprefix")
 							+ document.title
