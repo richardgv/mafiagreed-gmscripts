@@ -18,16 +18,16 @@ const buttonvals = new Array(
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">RLD</a> '
 			, /cdtimer\(4,"red-light-district",\d+/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/boxing">Boxing</a> '
-			, /cdtimer\(7,"boxing",\d+/),
+			, /cdtimer\((7|6),"boxing",\d+/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> '
-			, /cdtimer\(11,"family\/crimes",\d+/)
+			, /cdtimer\(1(0|1),"family\/crimes",\d+/)
 		);
 const prefs = new Array(
 		new Array("ajaxactioncheck", true),
 		new Array("showtimer", true),
 		new Array("adclickmissionsontop", true),
 		new Array("rmbadbuttons", true),
-		new Array("style", '#logobar { margin: 0 auto; font: 9pt "DejaVu Sans", Tahoma, sans-serif; background-color: rgba(10, 10, 10, 0.6); color: white; text-align: center; position: fixed; width: 100%; z-index: 999; left: 0; top: 0; } #actionlist a { text-decoration: none; } #status { font-size: 8pt; display: block; padding: 4px; position: fixed; left: 0; top: 0; } .statusinprison, .statusneterr { background: red; color: white; } .statusnormal { background-color: green; } #actionlist .actavail { background: green; padding: 0 2px; margin: 0 2px; } #actionlist .actunavail, #actionlist .actunavail a { color: lightGrey; } #actionlist .actwarn { background-color: red; padding: 0 2px; margin: 2px; }'),
+		new Array("style", '#logobar { margin: 0 auto; font: 9pt "DejaVu Sans", Tahoma, sans-serif; background-color: rgba(10, 10, 10, 0.6); color: white; text-align: center; position: fixed; width: 100%; z-index: 999; left: 0; top: 0; } #actionlist a { text-decoration: none; } #status { font-size: 8pt; display: block; padding: 4px; position: fixed; left: 0; top: 0; } .statusinprison, .statusneterr { background: red; color: white; } .statusnormal { background-color: green; } #actionlist .actavail { background: green; margin: 0 2px; } #actionlist .actionavail a { padding: 0 2px; } #actionlist .actunavail, #actionlist .actunavail a { color: lightGrey; } #actionlist .actwarn { background-color: red; } #actionlist .actwarn.actlnk a { padding: 0 2px; } #actionlist .actwarn.actlnk { margin-left: 2px; } #actionlist .actwarn.acttimerwrapper { margin-right: 2px; }'),
 		new Array("actionlistdefcontent", '<a href="http://www.mafiacreator.com/Mafia-Greed/kill-list">Bounty list</a> '),
 		new Array("actiontimerprefix", "("),
 		new Array("actiontimerpostfix", ") "),
@@ -136,27 +136,30 @@ function fcheckactions() {
 function fchecktime(j, rsptext) {
 	var tmmatch = rsptext.match(buttonvals[j][1]);
 	if(null == tmmatch)
-		return 0;
+		return -1;
 	tmmatch = tmmatch[0].match(/\d+$/);
 	return parseInt(tmmatch[0], 10);
 }
 function fcheckactionproc(j, tm) {
 	var ele, elewrapper;
-	if(!tm) fcheckactionavailable(j);
+	if(-1 == tm) fcheckactionavailable(j, actionlistunknownclass);
+	else if(!tm) fcheckactionavailable(j, actionlistavailableclass);
 	else {
 		ele = document.createElement("a");
 		ele.id = actionlistidprefix + j;
 		if(tm <= GM_getValue("warnthreshold")) {
-			ele.setAttribute("class", actionlistwarnclass);
+			ele.setAttribute("class"
+					, actionlistclass + " " + actionlistwarnclass);
 		}
 		else {
-			ele.setAttribute("class", actionlistunavailableclass);
+			ele.setAttribute("class"
+					, actionlistclass + " " + actionlistunavailableclass);
 			tmoutid[1][j] = window.setTimeout(
 					"document.evaluate(\"//a[@id='"
 					+ actionlistidprefix + j
 					+ "']\", document, null, XPathResult"
 					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.setAttribute('class', '"
-					+ actionlistwarnclass + "');"
+					+ actionlistclass + " " + actionlistwarnclass + "');"
 					, (tm - GM_getValue("warnthreshold")) * 1000);
 		}
 		ele.innerHTML = buttonvals[j][0];
@@ -173,15 +176,17 @@ function fcheckactionproc(j, tm) {
 			elewrapper.setAttribute("class", actiontimerclass + " ");
 			actionlistnode.appendChild(elewrapper);
 			if(tm <= GM_getValue("warnthreshold"))
-				elewrapper.setAttribute("class", actionlistwarnclass);
+				elewrapper.setAttribute("class"
+						, actiontimerclass + " " + actionlistwarnclass);
 			else {
-				elewrapper.setAttribute("class", actionlistunavailableclass);
+				elewrapper.setAttribute("class"
+						, actiontimerclass + " " + actionlistunavailableclass);
 				tmoutid[3][j] = window.setTimeout(
 						"document.evaluate(\"//a[@id='"
 						+ actiontimerwrapperidprefix + j
 						+ "']\", document, null, XPathResult"
 						+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.setAttribute('class', '"
-						+ actionlistwarnclass + "');"
+						+ actiontimerclass + " " + actionlistwarnclass + "');"
 						, (tm - GM_getValue("warnthreshold")) * 1000);
 			}
 			tmoutid[2][j] = window.setTimeout(
@@ -204,7 +209,7 @@ function fcheckactionproc(j, tm) {
 				+ actionlistidprefix + j
 				+ "']\", document, null, XPathResult"
 					+ ".FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.setAttribute('class', '"
-				+ actionlistavailableclass + "');"
+				+ actionlistclass + " " + actionlistavailableclass + "');"
 				, tm * 1000);
 	}
 }
@@ -213,16 +218,17 @@ function fprtallactions() {
 	for(j = 0; j < buttonvals.length; j++) {
 		ele = document.createElement("a");
 		ele.id = actionlistidprefix + j;
-		ele.setAttribute("class", actionlistunknownclass);
+		ele.setAttribute("class"
+				, actionlistclass + " " + actionlistunknownclass);
 		ele.innerHTML = buttonvals[j][0];
 		actionlistnode.appendChild(ele);
 	}
 }
 
-function fcheckactionavailable(j) {
+function fcheckactionavailable(j, cclass) {
 	var ele = document.createElement("a");
 	ele.id = actionlistidprefix + j;
-	ele.setAttribute("class", actionlistavailableclass);
+	ele.setAttribute("class", actionlistclass + " " + cclass);
 	ele.innerHTML = buttonvals[j][0];
 	actionlistnode.appendChild(ele);
 }
