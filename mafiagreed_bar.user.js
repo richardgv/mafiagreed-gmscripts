@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Mafiagreed Bar
-// @namespace      http://github.com/HiddenKn/mafiagreed-gmscripts-experimental
+// @namespace      http://github.com/richardgv/mafiagreed-gmscripts
 // @include        http://www.mafiacreator.com/Mafia-Greed
 // @include        http://www.mafiacreator.com/Mafia-Greed/*
 // @exclude        http://www.mafiacreator.com/Mafia-Greed/admin*
