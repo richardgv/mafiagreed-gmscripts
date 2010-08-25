@@ -12,15 +12,15 @@
 // Script constants
 const buttonvals = new Array(
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/crimes">Crime</a> '
-			, /cdtimer\(0,"crimes",\d+/),
+			, /cdtimer\(\d+,"crimes",\d+/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/cars/steal">Steal car</a> '
-			, /cdtimer\(2,"cars\/steal",\d+/),
+			, /cdtimer\(\d+,"cars\/steal",\d+/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">RLD</a> '
-			, /cdtimer\(4,"red-light-district",\d+/),
+			, /cdtimer\(\d+,"red-light-district",\d+/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/boxing">Boxing</a> '
-			, /cdtimer\((7|6),"boxing",\d+/),
+			, /cdtimer\(\d+,"boxing",\d+/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> '
-			, /cdtimer\(1(0|1),"family\/crimes",\d+/)
+			, /cdtimer\(\d+,"family\/crimes",\d+/)
 		);
 const prefs = new Array(
 		new Array("ajaxactioncheck", true),
