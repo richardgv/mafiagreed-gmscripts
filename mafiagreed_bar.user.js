@@ -12,15 +12,20 @@
 // Script constants
 const buttonvals = new Array(
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/crimes">Crime</a> '
-			, /cdtimer\(\d+,"crimes",\d+/),
+			, /cdtimer\(\d+,"crimes",\d+/
+			, /cdtimer\(\d+,"crimes",-/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/cars/steal">Steal car</a> '
-			, /cdtimer\(\d+,"cars\/steal",\d+/),
+			, /cdtimer\(\d+,"cars\/steal",\d+/
+			, /cdtimer\(\d+,"cars\/steal",-/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/red-light-district/search">RLD</a> '
-			, /cdtimer\(\d+,"red-light-district",\d+/),
+			, /cdtimer\(\d+,"red-light-district",\d+/
+			, /cdtimer\(\d+,"red-light-district",-/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/boxing">Boxing</a> '
-			, /cdtimer\(\d+,"boxing",\d+/),
+			, /cdtimer\(\d+,"boxing",\d+/
+			, /cdtimer\(\d+,"boxing",-/),
 		new Array('<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> '
-			, /cdtimer\(\d+,"family\/crimes",\d+/)
+			, /cdtimer\(\d+,"family\/crimes",\d+/
+			, /cdtimer\(\d+,"family\/crimes",-/)
 		);
 const prefs = new Array(
 		new Array("ajaxactioncheck", true),
@@ -135,8 +140,11 @@ function fcheckactions() {
 }
 function fchecktime(j, rsptext) {
 	var tmmatch = rsptext.match(buttonvals[j][1]);
-	if(null == tmmatch)
+	if(null == tmmatch) {
+		if(-1 != rsptext.search(buttonvals[j][2]))
+			return 0;
 		return -1;
+	}
 	tmmatch = tmmatch[0].match(/\d+$/);
 	return parseInt(tmmatch[0], 10);
 }
