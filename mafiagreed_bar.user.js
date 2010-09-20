@@ -1,3 +1,5 @@
+// vim: ts=4
+
 // ==UserScript==
 // @name           Mafiagreed Bar
 // @namespace      http://github.com/richardgv/mafiagreed-gmscripts
@@ -6,9 +8,8 @@
 // @exclude        http://www.mafiacreator.com/Mafia-Greed/admin*
 // ==/UserScript==
 
-// Script distributed under GPL license. (GPLv3 or later)
+// Script distributed under GPL license.
 // Contact HiddenKnowledge (HiddenKn) for bugs and support. Installing a Bugzilla or Trac for one Greasemonkey script is plainly not so worthwhile.
-// vim: set ts=4
 
 // Script constants
 const buttonvals = [
@@ -58,12 +59,10 @@ const prefs = new Array(
 		new Array("showtimer", true),
 		new Array("adclickmissionsontop", true),
 		new Array("rmbadbuttons", true),
-		new Array("actionrecheckbutton", true),
 		new Array("style", '#logobar { margin: 0 auto; font: 9pt "DejaVu Sans", Tahoma, sans-serif; background-color: rgba(10, 10, 10, 0.6); color: white; text-align: center; position: fixed; width: 100%; z-index: 999; left: 0; top: 0; } #actionlist a { text-decoration: none; } #status { font-size: 8pt; display: block; padding: 4px; position: fixed; left: 0; top: 0; } .statusinprison, .statusneterr { background: red; color: white; } .statusnormal { background-color: green; } #actionlist .actavail { background: green; margin: 0 2px; } #actionlist .actionavail a { padding: 0 2px; } #actionlist .actunavail, #actionlist .actunavail a { color: lightGrey; } #actionlist .actwarn { background-color: red; } #actionlist .actwarn.actlnk a { padding: 0 2px; } #actionlist .actwarn.actlnk { margin-left: 2px; } #actionlist .actwarn.acttimerwrapper { margin-right: 2px; }'),
 		new Array("actionlistdefcontent", '<a href="http://www.mafiacreator.com/Mafia-Greed/kill-list">Bounty list</a> '),
 		new Array("actiontimerprefix", "("),
 		new Array("actiontimerpostfix", ") "),
-		new Array("ajaxactioncheckreloadinterval", 30),
 		new Array("warnthreshold", 10),
 		new Array("statusnormal", '<a id="status" class="statusnormal">NORMAL</a> '),
 		new Array("statusinprison", '<a id="status" class="statusinprison">IN PRISON</a> '),
@@ -153,7 +152,6 @@ var tmoutid = new Array(new Array(buttonvals.length)
 // Ajax action checking functions
 function fcheckactions() {
 	var xmlhttp = new XMLHttpRequest();
-	var tm = (new Date).getTime();
 	xmlhttp.onreadystatechange = function() {
 			if (xmlhttp.readyState == 4) {
 				if(xmlhttp.status != 200) {
@@ -306,6 +304,7 @@ function fconstrecreate() {
 	str = str.substr(0, str.length - 1);
 	str += "];";
 	// Recreate actionlistnode
+	str += "actionlistnode = document.getElementById('" + actionlistid + "');";
 	str += "logo = document.getElementById('" + logoid + "');";
 
 	return str;
@@ -337,11 +336,6 @@ if(usrprefs['rmbadbuttons']) {
 	if(ele)
 		ele.parentNode.removeChild(ele);
 }
-if(usrprefs['actionrecheckbutton']) {
-	ele = document.createElement("a");
-	ele.onclick = fconstrecreate() + fcheckactions + fchecktime
-			+ fcheckactionproc + fprtallactions + fcheckactionavailable
-			+ 'var ele = document.createElement("a")
 
 // Ajax action check
 if(usrprefs['ajaxactioncheck']) {
