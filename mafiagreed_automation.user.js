@@ -21,7 +21,7 @@ function xpathclick(xpath) {
 }
 
 if("http://www.mafiacreator.com/Mafia-Greed/higher-lower" == document.URL) {
-	var ele = document.evaluate("//td[@class='licht']/span[@style='font-size: 160%; font-weight: bold; display: block; padding: 10px;']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	var ele = document.evaluate("//td[@class='tcell']/span[@style='font-size: 160%; font-weight: bold; display: block; padding: 10px;']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 	if(ele) {
 		var num = parseInt(ele.innerHTML, 10);
 		var choice;
