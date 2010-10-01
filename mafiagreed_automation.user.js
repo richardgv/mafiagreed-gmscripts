@@ -6,6 +6,8 @@
 // @include		http://www.mafiacreator.com/Mafia-Greed/boxing
 // @include		http://www.mafiacreator.com/Mafia-Greed/red-light-district/search
 // @include		http://www.mafiacreator.com/Mafia-Greed/suspicious-packages
+// @include		http://www.mafiacreator.com/Mafia-Greed/wheel-of-fortune
+// @include		http://www.mafiacreator.com/Mafia-Greed/family/wheel-of-fortune
 // ==/UserScript==
 
 function randnum() { return Math.floor(Math.random() * 100); }
@@ -39,3 +41,6 @@ else if("http://www.mafiacreator.com/Mafia-Greed/boxing" == document.URL
 		|| "http://www.mafiacreator.com/Mafia-Greed/red-light-district/search" == document.URL
 		|| "http://www.mafiacreator.com/Mafia-Greed/suspicious-packages" == document.URL)
 	xpathclick("//td/input[@class='submit good']");
+else if("http://www.mafiacreator.com/Mafia-Greed/wheel-of-fortune" == document.URL
+		|| "http://www.mafiacreator.com/Mafia-Greed/family/wheel-of-fortune" == document.URL)
+	xpathclick("//input[@value='Spin the wheel!']");
