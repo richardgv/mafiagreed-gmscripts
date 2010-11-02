@@ -59,11 +59,13 @@ const prefs = new Array(
 		new Array("showtimer", true),
 		new Array("adclickmissionsontop", true),
 		new Array("rmbadbuttons", true),
+		new Array("showhealthbar", true),
 		new Array("style", '#logobar { margin: 0 auto; font: 9pt "DejaVu Sans", Tahoma, sans-serif; background-color: rgba(10, 10, 10, 0.6); color: white; text-align: center; position: fixed; width: 100%; z-index: 999; left: 0; top: 0; } #actionlist a { text-decoration: none; } #status { font-size: 8pt; display: block; padding: 4px; position: fixed; left: 0; top: 0; } .statusinprison, .statusneterr { background: red; color: white; } .statusnormal { background-color: green; } #actionlist .actavail { background: green; margin: 0 2px; } #actionlist .actionavail a { padding: 0 2px; } #actionlist .actunavail, #actionlist .actunavail a { color: lightGrey; } #actionlist .actwarn { background-color: red; } #actionlist .actwarn.actlnk a { padding: 0 2px; } #actionlist .actwarn.actlnk { margin-left: 2px; } #actionlist .actwarn.acttimerwrapper { margin-right: 2px; }'),
 		new Array("actionlistdefcontent", '<a href="http://www.mafiacreator.com/Mafia-Greed/kill-list">Bounty list</a> '),
 		new Array("actiontimerprefix", "("),
 		new Array("actiontimerpostfix", ") "),
 		new Array("warnthreshold", 10),
+		new Array("healthalertthreshold", 50),
 		new Array("statusnormal", '<a id="status" class="statusnormal">NORMAL</a> '),
 		new Array("statusinprison", '<a id="status" class="statusinprison">IN PRISON</a> '),
 		new Array("statusinprisontitleprefix", "(In prison) "),
@@ -84,6 +86,9 @@ const actionlistavailableclass = "actavail";
 const actionlistunavailableclass = "actunavail";
 const actionlistwarnclass = "actwarn";
 const actionlistunknownclass = "actunk";
+const healthbarid = "healthbar";
+const healthalertid = "healthalert";
+const healthalerttext = "Well, %n, your face looks pale. You'd better see the doctor right now.";
 
 // Initializing script configurations
 var i;
@@ -139,8 +144,13 @@ function foptionoffadclickmissionsontop() {
 var logo = document.createElement("div");
 var formnode = document.createElement("form");
 var actionlistnode = document.createElement("div");
+var healthalertnode = document.createElement("div");
+var healthbarnode = document.createElement("tr");
 var inputnode;
+var healthnode;
+var healthval = -1;
 var str;
+var username = null;
 var ele;
 var tmoutid = new Array(new Array(buttonvals.length)
 		, new Array(buttonvals.length)
@@ -148,6 +158,26 @@ var tmoutid = new Array(new Array(buttonvals.length)
 		, new Array(buttonvals.length)
 		, new Array(buttonvals.length)
 		);
+if(null != (ele = document.evaluate("//div[@id='chatbar2']/table/tbody/tr/td[2]/a", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue)) {
+		username = ele.innerHTML;
+}
+logo.id = logoid;
+formnode.method = "post";
+actionlistnode.id = actionlistid;
+healthalertnode.id = healthalertid;
+healthbarnode.id = healthbarid;
+if(null != (healthnode = document.evaluate("//div[@id='rechts']/table//td[string()='Health']/parent::tr/td[last()]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue)) {
+	healthval = parseInt(healthnode.innerHTML, 10);
+	healthnode = healthnode.parentNode;
+}
+
+function msgproc(msgtext) {
+	msgtext = msgtext.replace("%%", "|%%|");
+	if(null != username)
+		msgtext = msgtext.replace("%n", username);
+	msgtext = msgtext.replace("|%%|", "%");
+	return msgtext;
+}
 
 // Ajax action checking functions
 function fcheckactions() {
@@ -310,9 +340,7 @@ function fconstrecreate() {
 	return str;
 }
 
-logo.id = logoid;
-formnode.method = "post";
-actionlistnode.id = actionlistid;
+
 if(usrprefs['adclickmissionsontop']) {
 	for(i = 1; i <= 5; i++) {
 		if(null != (inputnode = document.evaluate("//input[@type='submit'][@name='clickmission'][@value='" + i + "']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue)) {
@@ -326,6 +354,23 @@ if(usrprefs['adclickmissionsontop']) {
 }
 actionlistnode.innerHTML = usrprefs['actionlistdefcontent'];
 logo.appendChild(actionlistnode);
+if(usrprefs['healthalertthreshold'] > 0
+		&& healthval >= 0
+		&& healthval <= usrprefs['healthalertthreshold']) {
+	healthalertnode.innerHTML = msgproc(healthalerttext);
+	logo.appendChild(healthalertnode);
+}
+if(usrprefs['showhealthbar'] && healthval >= 0) {
+	var tmpnode = document.createElement("td");
+	tmpnode.align = "center";
+	tmpnode.setAttribute('colspan', '3');
+	healthbarnode.appendChild(tmpnode);
+	tmpnode.innerHTML = '<span style="white-space: nowrap;"><img height="10" align="absmiddle" src="/images/bars_05/health_1.png"><img width="' + healthval + '" height="10" align="absmiddle" src="/images/bars_05/health_2.png">';
+	if(100 != healthval)
+		tmpnode.innerHTML += '<img width="' + (100 - healthval) + '" height="10" align="absmiddle" src="/images/bars_05/health_5.png">';
+	tmpnode.innerHTML += '<img height="10" align="absmiddle" src="/images/bars_05/health_6.png"></span><span class="rankbar_text">&nbsp;' + healthval + '%</span>';
+	healthnode.parentNode.insertBefore(healthbarnode, healthnode.nextSibling);
+}
 document.body.insertBefore(logo, document.body.firstChild);
 GM_addStyle(usrprefs['style']);
 if(usrprefs['rmbadbuttons']) {
