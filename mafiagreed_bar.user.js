@@ -46,9 +46,25 @@ const buttonvals = [
 				defstate	: true
 			},
 			{
+				id			: 'hw',
+				name		: 'hw',
+				lnk			: '<a href="http://www.mafiacreator.com/Mafia-Greed/higher-lower">H/W</a> ',
+				tmregex		: /cdtimer\(\d+,"higher-lower",\d+/,
+				availregex	: /cdtimer\(\d+,"higher-lower",-/,
+				defstate	: true
+			},
+			{
+				id			: 'wof',
+				name		: 'wof',
+				lnk			: '<a href="http://www.mafiacreator.com/Mafia-Greed/wheel-of-fortune">WoF</a> ',
+				tmregex		: /cdtimer\(\d+,"wheel-of-fortune",\d+/,
+				availregex	: /cdtimer\(\d+,"wheel-of-fortune",-/,
+				defstate	: true
+			},
+			{
 				id			: 'familycrimes',
 				name		: 'Family crimes',
-				lnk			: '<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">Family Crimes</a> ',
+				lnk			: '<a href="http://www.mafiacreator.com/Mafia-Greed/family/crimes">FmCrimes</a> ',
 				tmregex		: /cdtimer\(\d+,"family\/crimes",\d+/,
 				availregex	: /cdtimer\(\d+,"family\/crimes",-/,
 				defstate	: true
@@ -193,6 +209,7 @@ function fcheckactions() {
 						document.title = usrprefs['statusinprisontitleprefix']
 							+ document.title
 							+ usrprefs['statusinprisontitlepostfix'];
+					fprtallactions();
 				}
 				else {
 					actionlistnode.innerHTML += usrprefs['statusnormal'];
