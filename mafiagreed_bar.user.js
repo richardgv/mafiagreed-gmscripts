@@ -212,7 +212,7 @@ function fcheckactions() {
 					fprtallactions();
 				}
 				else {
-					actionlistnode.innerHTML += usrprefs['statusnormal'];
+					actionlistnode.innerHTML = usrprefs['actionlistdefcontent'] + usrprefs['statusnormal'];
 					for(i in buttonvals)
 						if(actionconf[i])
 							fcheckactionproc(i
@@ -400,7 +400,6 @@ if(usrprefs['rmbadbuttons']) {
 }
 
 // Ajax action check
-if(usrprefs['ajaxactioncheck']) {
+fprtallactions();
+if(usrprefs['ajaxactioncheck'])
 	fcheckactions();
-}
-else fprtallactions();
